@@ -23,5 +23,14 @@ services:
     depends_on:
       - db
 
+  worker:
+    build: .
+    container_name: chaishots_worker
+    command: npm run worker
+    environment:
+      DATABASE_URL: postgres://admin:password@db:5432/chaishots
+    depends_on:
+      - db
+
 volumes:
   pgdata:

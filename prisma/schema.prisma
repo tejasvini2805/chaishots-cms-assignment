@@ -3,7 +3,6 @@ generator client {
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -22,46 +21,84 @@ enum LessonStatus {
   ARCHIVED
 }
 
+enum ContentType {
+  VIDEO
+  ARTICLE
+}
+
 model Program {
-  id          String        @id @default(uuid())
-  title       String
-  description String?
-  status      ProgramStatus @default(DRAFT)
-  publishedAt DateTime?
+  id                 String        @id @default(uuid())
+  title              String
+  description        String?
+  languagePrimary    String
+  languagesAvailable String[]
+  status             ProgramStatus @default(DRAFT)
+  publishedAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
-  terms       Term[]
+  // JSON assets: posters per language + variant
+  posterAssets       Json
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  terms              Term[]
+  topics             ProgramTopic[]
+}
+
+model Topic {
+  id       String          @id @default(uuid())
+  name     String          @unique
+  programs ProgramTopic[]
+}
+
+model ProgramTopic {
+  programId String
+  topicId   String
+
+  program Program @relation(fields: [programId], references: [id])
+  topic   Topic   @relation(fields: [topicId], references: [id])
+
+  @@id([programId, topicId])
 }
 
 model Term {
-  id        String   @id @default(uuid())
-  title     String?
-  order     Int
+  id         String   @id @default(uuid())
+  title      String?
+  order      Int
+  programId  String
+  createdAt DateTime @default(now())
 
-  program   Program @relation(fields: [programId], references: [id])
-  programId String
-
-  lessons   Lesson[]
+  program Program @relation(fields: [programId], references: [id])
+  lessons Lesson[]
 
   @@unique([programId, order])
 }
 
 model Lesson {
-  id          String        @id @default(uuid())
-  title       String
-  order       Int
-  status      LessonStatus  @default(DRAFT)
+  id                       String        @id @default(uuid())
+  title                    String
+  order                    Int
+  status                   LessonStatus @default(DRAFT)
+  contentType              ContentType
+  durationMs               Int?
+  isPaid                   Boolean       @default(false)
 
-  publishAt   DateTime?
-  publishedAt DateTime?
+  contentLanguagePrimary   String
+  contentLanguagesAvailable String[]
+  contentUrlsByLanguage    Json
 
-  term        Term          @relation(fields: [termId], references: [id])
-  termId      String
+  subtitleLanguages        String[]
+  subtitleUrlsByLanguage   Json?
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  // JSON assets: thumbnails per language + variant
+  thumbnailAssets          Json
+
+  publishAt                DateTime?
+  publishedAt              DateTime?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  termId String
+  term   Term @relation(fields: [termId], references: [id])
 
   @@unique([termId, order])
   @@index([status, publishAt])

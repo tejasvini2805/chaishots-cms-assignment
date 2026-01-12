@@ -9,37 +9,28 @@ const client_1 = require("@prisma/client");
 const app = (0, fastify_1.default)({ logger: true });
 const prisma = new client_1.PrismaClient();
 async function startServer() {
-    // ✅ CORS
     await app.register(cors_1.default, {
-        origin: '*',
+        origin: true
     });
-    // Health check
     app.get('/health', async () => {
-        await prisma.$queryRaw `SELECT 1`;
         return { status: 'ok' };
     });
-    // Catalog API
     app.get('/catalog/programs', async () => {
-        const programs = await prisma.program.findMany({
+        return prisma.program.findMany({
             where: { status: 'PUBLISHED' },
             include: {
                 terms: {
                     include: {
                         lessons: {
                             where: { status: 'PUBLISHED' },
-                            orderBy: { order: 'asc' },
-                        },
-                    },
-                },
-            },
-            orderBy: { publishedAt: 'desc' },
+                            orderBy: { order: 'asc' }
+                        }
+                    }
+                }
+            }
         });
-        return programs;
     });
     await app.listen({ port: 3000, host: '0.0.0.0' });
     console.log('🚀 API running on port 3000');
 }
-startServer().catch(err => {
-    app.log.error(err);
-    process.exit(1);
-});
+startServer().catch(console.error);
