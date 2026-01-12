@@ -56,13 +56,15 @@ Scheduled Worker (Node.js)
 - Node.js (required only for local development)
 
 ---
+s
 
 ### Start All Services
 
+```bash
+docker compose up --build
 
 docker compose up --build
 This starts:
-
 PostgreSQL
 
 API server
