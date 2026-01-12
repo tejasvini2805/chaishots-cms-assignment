@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    container_name: chaishots_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: chaishots
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: chaishots_api
+    command: npm start
+    environment:
+      DATABASE_URL: postgres://admin:password@db:5432/chaishots
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

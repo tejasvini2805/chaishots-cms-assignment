@@ -1,0 +1,68 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProgramStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LessonStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+model Program {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  status      ProgramStatus @default(DRAFT)
+  publishedAt DateTime?
+
+  terms       Term[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Term {
+  id        String   @id @default(uuid())
+  title     String?
+  order     Int
+
+  program   Program @relation(fields: [programId], references: [id])
+  programId String
+
+  lessons   Lesson[]
+
+  @@unique([programId, order])
+}
+
+model Lesson {
+  id          String        @id @default(uuid())
+  title       String
+  order       Int
+  status      LessonStatus  @default(DRAFT)
+
+  publishAt   DateTime?
+  publishedAt DateTime?
+
+  term        Term          @relation(fields: [termId], references: [id])
+  termId      String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([termId, order])
+  @@index([status, publishAt])
+}
