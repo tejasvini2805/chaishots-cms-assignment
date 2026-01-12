@@ -25,9 +25,6 @@ PostgreSQL (Prisma ORM)
 ↑
 Scheduled Worker (Node.js)
 
-yaml
-Copy code
-
 ---
 
 ## Tech Stack
