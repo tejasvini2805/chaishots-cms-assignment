@@ -59,7 +59,7 @@ Scheduled Worker (Node.js)
 
 ### Start All Services
 
-```bash
+
 docker compose up --build
 This starts:
 
@@ -74,8 +74,7 @@ Database initialization
 Database Migrations
 Apply database migrations:
 
-bash
-Copy code
+
 docker compose exec api npx prisma migrate deploy
 Migrations are committed to the repository
 
@@ -84,8 +83,7 @@ Fully reproducible across environments
 Seed Data
 Seed the database with demo content:
 
-bash
-Copy code
+
 docker compose exec api npx prisma db seed
 Seed creates:
 2 Programs
@@ -120,8 +118,7 @@ Concurrency-safe (supports multiple workers)
 Designed for production reliability
 
 Logs
-bash
-Copy code
+
 docker compose logs worker
 Public Catalog API
 Endpoints
@@ -169,8 +166,7 @@ CMS editing is intentionally backend-only
 Demo Flow (Recommended)
 Start all services
 
-bash
-Copy code
+
 docker compose up --build
 Apply migrations
 
@@ -178,8 +174,7 @@ Seed the database
 
 Watch worker logs
 
-bash
-Copy code
+
 docker compose logs worker
 Observe scheduled lesson auto-publishing
 
